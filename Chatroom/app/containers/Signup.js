@@ -7,14 +7,16 @@ import {
   TouchableOpacity,
   TextInput,
   Dimensions,
-  ScrollView,
-  ActivityIndicator
+  ScrollView
 } from 'react-native';
 
 import { bindActionCreators } from 'redux';
 import { connect }  from 'react-redux';
 
 import * as signupActions from '../actions/SignupActions';
+
+import ErrorMessage from '../components/ErrorMessage';
+import MyActivityIndicator from '../components/MyActivityIndicator';
 
 
 const window = Dimensions.get("window");
@@ -125,9 +127,7 @@ class Signup extends Component {
 
     if(this.state.loading){
         return(
-            <View style={{flex:1,justifyContent:'center',alignItems:'center'}} >
-                <ActivityIndicator size={"large"} />
-            </View>
+            <MyActivityIndicator message={"Signing Up"}/>
         );
     }else if(this.state.status){
         return(
@@ -195,7 +195,9 @@ class Signup extends Component {
                             underlineColorAndroid='transparent'
                             secureTextEntry={true}
                         />
-                        { this.state.error && <Text style={styles.errorText}>{JSON.stringify(this.state.error)}</Text> }
+                        {
+                            this.state.error && <ErrorMessage message={JSON.stringify(this.state.error)} />
+                        }
                         <TouchableOpacity onPress={() => {this.signupClick()}}>
                           <Text style={styles.button}>Sign Up</Text>
                         </TouchableOpacity>

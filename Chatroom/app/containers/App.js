@@ -10,14 +10,19 @@ import {Provider} from 'react-redux';
 
 import {StackNavigator} from 'react-navigation';
 
+import store from '../store';
+
 import Login from './Login';
 import Signup from './Signup'
-import store from '../store';
+import Home from './Home'
+
 
 const AppNav = StackNavigator({
 
-  Signup : { screen: Signup },
-  Login : { screen: Login}
+
+  Home : {screen: Home},
+  Login : { screen: Login},
+  Signup : { screen: Signup }
 });
 
 export default class App extends Component {

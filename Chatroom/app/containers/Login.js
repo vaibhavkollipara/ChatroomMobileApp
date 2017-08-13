@@ -7,43 +7,128 @@ import {
   TouchableOpacity,
   ScrollView,
   TextInput,
-  Dimensions
+  Dimensions,
+  AsyncStorage
 } from 'react-native';
+import { NavigationActions } from 'react-navigation'
+import { bindActionCreators } from 'redux';
+import { connect }  from 'react-redux';
+
+import * as loginActions from '../actions/LoginActions';
+
+import ErrorMessage from '../components/ErrorMessage';
+import MyActivityIndicator from '../components/MyActivityIndicator';
 
 const window = Dimensions.get("window")
 
-export default class Login extends Component {
+class Login extends Component {
 
     static navigationOptions = {
     title: 'Chatroom',
     header:null
   }
 
-    pressed(){
-        this.props.navigation.navigate('Signup',{});
+    constructor(){
+        super();
+        this.state = {
+            token  : null,
+            error : null,
+            loading : false,
+            form_data : {
+                username : "",
+                password : ""
+            }
+        };
     }
+
+    navigateToHome(){
+        const resetAction = NavigationActions.reset({
+              index: 0,
+              actions: [
+                NavigationActions.navigate({ routeName: 'Home'})
+              ]
+            })
+        this.props.navigation.dispatch(resetAction);
+    }
+
+    componentWillReceiveProps(nextProps) {
+         if(nextProps.login.token!==null){
+            AsyncStorage.setItem("token",nextProps.login.token).then(() => {
+                this.navigateToHome();
+            });
+          }else if (nextProps.login !== this.props.login) {
+            this.setState({
+                authenticated : nextProps.login.authenticated,
+                error : nextProps.login.error,
+                loading : nextProps.login.loading
+            });
+          }
+    }
+
+    usernameChange(value){
+        this.setState({
+            form_data : {...this.state.form_data,username:value}
+        });
+    }
+
+    passwordChange(value){
+        this.setState({
+            form_data : {...this.state.form_data,password:value}
+        });
+    }
+
+    isFormFilled(){
+        for(let key in this.state.form_data){
+            if(this.state.form_data[key] === "" || this.state.form_data[key] === null)
+                return false;
+        }
+        return true;
+    }
+
+    loginClick(){
+        if(!this.isFormFilled()){
+            this.setState({
+                error : {error : "All fields Required"}
+            });
+        }else{
+            this.props.authenticate(this.state.form_data)
+        }
+
+    }
+
   render() {
+    if(this.state.loading){
+        return (
+            <MyActivityIndicator message={"Verifying Credentials"}/>
+        );
+    }else{
     return (
         <View style={styles.container}>
                 <Text style={styles.title}>ChatRoom</Text>
                 <TextInput
                     style={styles.inputbox}
-                    onChangeText={(text) => {}}
                     placeholder={"username"}
                     autoFocus={true}
+                    onChangeText={(text) => {this.usernameChange(text)}}
+                    value={this.state.form_data.username}
                     underlineColorAndroid='transparent'
                 />
                 <TextInput
                     style={styles.inputbox}
                     onChangeText={(text) => {}}
                     placeholder="password"
+                    onChangeText={(text) => {this.passwordChange(text)}}
+                    value={this.state.form_data.password}
                     underlineColorAndroid='transparent'
                     secureTextEntry={true}
                 />
-            <TouchableOpacity onPress={() => {}}>
+            {
+                this.state.error && <ErrorMessage message={JSON.stringify(this.state.error)} />
+            }
+            <TouchableOpacity onPress={() => {this.loginClick()}}>
                 <Text style={styles.button}>Login</Text>
             </TouchableOpacity>
-            <TouchableOpacity onPress={() => {this.pressed()}}>
+            <TouchableOpacity onPress={() => {this.props.navigation.navigate('Signup',{});}}>
                 <Text style={styles.link}>Sign Up</Text>
             </TouchableOpacity>
             <View style={styles.footer}>
@@ -51,6 +136,7 @@ export default class Login extends Component {
             </View>
         </View>
     );
+    }
   }
 }
 
@@ -103,4 +189,19 @@ const styles = StyleSheet.create({
   }
 });
 
+function mapStateToProps(state){
+  return {
+    login : state.login
+  };
+}
+
+
+function mapDispatchToProps(dispatch){
+    return bindActionCreators({
+                authenticate : loginActions.authenticate
+            },dispatch);
+}
+
 AppRegistry.registerComponent('Login', () => Login);
+
+export default connect(mapStateToProps,mapDispatchToProps)(Login);
