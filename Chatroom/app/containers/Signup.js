@@ -17,6 +17,7 @@ import * as signupActions from '../actions/SignupActions';
 
 import ErrorMessage from '../components/ErrorMessage';
 import MyActivityIndicator from '../components/MyActivityIndicator';
+import MyStatusBar from '../components/MyStatusBar';
 
 
 const window = Dimensions.get("window");
@@ -127,11 +128,15 @@ class Signup extends Component {
 
     if(this.state.loading){
         return(
-            <MyActivityIndicator message={"Signing Up"}/>
+            <View>
+                <MyStatusBar />
+                <MyActivityIndicator message={"Signing Up"}/>
+            </View>
         );
     }else if(this.state.status){
         return(
                 <View style={{flex:1,justifyContent:'center',alignItems:'center'}} >
+                    <MyStatusBar />
                     <Text style={styles.title}>ChatRoom</Text>
                     <Text style={styles.successText}>Signup Successful</Text>
                     <TouchableOpacity onPress={() => {this.pressed()}}>
@@ -142,6 +147,8 @@ class Signup extends Component {
     }else{
 
             return (
+                <View style={styles.container}>
+                <MyStatusBar />
                 <ScrollView
                     style={styles.container}
                     contentContainerStyle={{
@@ -205,6 +212,7 @@ class Signup extends Component {
                         <Text style={styles.link} >Login</Text>
                     </TouchableOpacity>
                 </ScrollView>
+                </View>
             );
     }
   }

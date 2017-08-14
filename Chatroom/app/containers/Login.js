@@ -18,6 +18,7 @@ import * as loginActions from '../actions/LoginActions';
 
 import ErrorMessage from '../components/ErrorMessage';
 import MyActivityIndicator from '../components/MyActivityIndicator';
+import MyStatusBar from '../components/MyStatusBar';
 
 const window = Dimensions.get("window")
 
@@ -35,8 +36,8 @@ class Login extends Component {
             error : null,
             loading : false,
             form_data : {
-                username : "",
-                password : ""
+                username : "user8",
+                password : "Commonpassword1"
             }
         };
     }
@@ -99,11 +100,15 @@ class Login extends Component {
   render() {
     if(this.state.loading){
         return (
-            <MyActivityIndicator message={"Verifying Credentials"}/>
+            <View>
+                <MyStatusBar />
+                <MyActivityIndicator message={"Verifying Credentials"}/>
+            </View>
         );
     }else{
     return (
         <View style={styles.container}>
+                <MyStatusBar />
                 <Text style={styles.title}>ChatRoom</Text>
                 <TextInput
                     style={styles.inputbox}

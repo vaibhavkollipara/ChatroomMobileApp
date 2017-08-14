@@ -13,13 +13,14 @@ import {StackNavigator} from 'react-navigation';
 import store from '../store';
 
 import Login from './Login';
-import Signup from './Signup'
-import Home from './Home'
+import Signup from './Signup';
+import Home from './Home';
+import Test from './Test';
 
 
 const AppNav = StackNavigator({
 
-
+  // Test : {screen : Test},
   Home : {screen: Home},
   Login : { screen: Login},
   Signup : { screen: Signup }

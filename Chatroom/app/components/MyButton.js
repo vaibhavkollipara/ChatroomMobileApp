@@ -8,6 +8,11 @@ import {
 
 
 export default class ErrorMessage extends Component {
+
+  static defaultProps = {
+      width : null
+  }
+
   render() {
     return (
         <TouchableOpacity onPress={() => this.props.onClick()}>

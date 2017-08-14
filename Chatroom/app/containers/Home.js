@@ -19,13 +19,17 @@ import ErrorMessage from '../components/ErrorMessage';
 import MyActivityIndicator from '../components/MyActivityIndicator';
 import MyButton from '../components/MyButton';
 
-const window = Dimensions.get("window")
+import Header from '../components/Header';
+import MyStatusBar from '../components/MyStatusBar';
+
+const window = Dimensions.get("window");
 
 
 class Home extends Component {
 
   static navigationOptions = {
-    title: 'Home'
+    title: 'Home',
+    header : null
   }
 
     constructor(){
@@ -63,6 +67,24 @@ class Home extends Component {
         }
     }
 
+    settings(){
+      return [
+        {
+            name : 'New Chatroom',
+            action: () => {alert("New Chatroom");}
+        },
+        {
+            name : 'Logout',
+            action : this.logout.bind(this)
+        },
+        {
+            name : 'Developer Details',
+            action : () => {alert(`Vaibhav Kollipara\nvkollip1@binghamton.edu\n660-528-5433`);}
+        }
+      ]
+
+    }
+
     navigateToLoginScreen(){
         const resetAction = NavigationActions.reset({
               index: 0,
@@ -85,15 +107,17 @@ class Home extends Component {
             <MyActivityIndicator message={"Fetching User Details"} />
         );
     }else{
+
+      let action = {
+        title:"Logout",
+        clicked : this.logout.bind(this)
+      }
         return (
             <View style={styles.container}>
-                { this.state.user &&
-                  <View>
-                    <Text>{this.state.user.fullname}</Text>
-                    <Text>{this.state.user.email}</Text>
-                  </View>
+                <MyStatusBar />
+                {
+                    this.state.user && <Header title={this.state.user.fullname} settings={this.settings()}/>
                 }
-                <MyButton width={window.width/2} buttonText={"Logout"} onClick={() => {this.logout();}}/>
             </View>
         );
     }
