@@ -36,8 +36,8 @@ class Login extends Component {
             error : null,
             loading : false,
             form_data : {
-                username : "user8",
-                password : "Commonpassword1"
+                username : "",
+                password : ""
             }
         };
     }
@@ -53,29 +53,33 @@ class Login extends Component {
     }
 
     componentWillReceiveProps(nextProps) {
-         if(nextProps.login.token!==null){
-            AsyncStorage.setItem("token",nextProps.login.token).then(() => {
-                this.navigateToHome();
-            });
-          }else if (nextProps.login !== this.props.login) {
+          if (nextProps.login !== this.props.login) {
             this.setState({
-                authenticated : nextProps.login.authenticated,
+                token : nextProps.login.token,
                 error : nextProps.login.error,
                 loading : nextProps.login.loading
             });
           }
+          if(nextProps.login.token!==null){
+            AsyncStorage.setItem("token",nextProps.login.token).then(() => {
+                this.navigateToHome();
+            });
+        }
     }
 
     usernameChange(value){
+        console.log(`Value : ${value}`);
         this.setState({
             form_data : {...this.state.form_data,username:value}
         });
+        console.log(` form value : ${this.state.form_data.username}`);
     }
 
     passwordChange(value){
         this.setState({
             form_data : {...this.state.form_data,password:value}
         });
+        console.log(this.state.form_data.password);
     }
 
     isFormFilled(){
@@ -89,7 +93,7 @@ class Login extends Component {
     loginClick(){
         if(!this.isFormFilled()){
             this.setState({
-                error : {error : "All fields Required"}
+                error : {error : ["All fields Required"]}
             });
         }else{
             this.props.authenticate(this.state.form_data)
@@ -128,7 +132,7 @@ class Login extends Component {
                     secureTextEntry={true}
                 />
             {
-                this.state.error && <ErrorMessage message={JSON.stringify(this.state.error)} />
+                this.state.error && <ErrorMessage message={this.state.error} />
             }
             <TouchableOpacity onPress={() => {this.loginClick()}}>
                 <Text style={styles.button}>Login</Text>

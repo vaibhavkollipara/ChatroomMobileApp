@@ -2,21 +2,51 @@ import React, { Component } from 'react';
 import {
   StyleSheet,
   Text,
-  View
+  View,
+  Dimensions
 } from 'react-native';
 
 
+const window = Dimensions.get("window");
+
 export default class ErrorMessage extends Component {
+
+    getErrorContent(errors){
+        console.log(errors);
+        let i=1;
+        return errors.map((error) => <Text key={i++} style={styles.errorText} >{error}</Text>);
+    }
+
+    getErrorMessages(){
+        console.log(this.props.message);
+        return Object.entries(this.props.message).map(([key, value]) => {
+                                        console.log(`Key : ${key}, Value: ${value}`);
+                                        return (
+                                            <View key={key}>
+                                                {this.getErrorContent(value)}
+                                            </View>
+                                        );
+                                });
+    }
+
   render() {
+
     return (
-        <Text style={styles.textStyle}>{this.props.message}</Text>
+        <View>
+            {this.getErrorMessages()}
+        </View>
     );
   }
 }
 
 const styles = StyleSheet.create({
-  textStyle: {
-    color: 'red',
-    fontWeight: 'bold'
-  }
+
+    errorTitle:{
+        color:'red',
+        fontWeight:'bold',
+        fontSize:20,
+    },
+    errorText:{
+        color:'red'
+    }
 });

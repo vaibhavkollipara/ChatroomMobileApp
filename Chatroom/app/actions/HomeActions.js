@@ -21,7 +21,7 @@ export function fetchUserDetails(token){
                 });
             }
         }).catch(response => {
-            dispatch( {type:"FETCH_USER_DETAILS_FAILED" , payload : {error :"Something Wrong..."}});
+            dispatch( {type:"FETCH_USER_DETAILS_FAILED" , payload : {error :"Please check your network connection\nor\nTry Again Later"}});
         });
     }
 }
@@ -47,7 +47,7 @@ export function refreshChatroomsList(token){
             }
 
         }).catch(error => {
-            dispatch({type:"CHATROOMS_REFRESH_FAILED",payload:{error: "problem refreshing chatroom"}});
+            dispatch({type:"CHATROOMS_REFRESH_FAILED",payload:{error: ["problem refreshing chatroom"]}});
         });
     }
 }

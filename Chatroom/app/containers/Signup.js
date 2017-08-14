@@ -62,11 +62,11 @@ class Signup extends Component {
     signupClick(){
         if(!this.isFormFilled()){
             this.setState({
-                error : { error : "All fields required"}
+                error : { error : ["All fields required"]}
             });
         }else if(!this.didPasswordsMatch()){
             this.setState({
-                error : { error : "Passwords did not match"}
+                error : { error : ["Passwords did not match"]}
             });
         }else{
             this.setState({
@@ -203,7 +203,7 @@ class Signup extends Component {
                             secureTextEntry={true}
                         />
                         {
-                            this.state.error && <ErrorMessage message={JSON.stringify(this.state.error)} />
+                            this.state.error && <ErrorMessage message={this.state.error} />
                         }
                         <TouchableOpacity onPress={() => {this.signupClick()}}>
                           <Text style={styles.button}>Sign Up</Text>

@@ -96,9 +96,10 @@ class Home extends Component {
     }
 
     logout(){
-        AsyncStorage.removeItem("token");
-        this.props.logout();
-        this.navigateToLoginScreen();
+        AsyncStorage.removeItem("token").then(() => {
+            this.props.logout();
+            this.navigateToLoginScreen();
+        });
     }
 
   render() {
@@ -116,7 +117,12 @@ class Home extends Component {
             <View style={styles.container}>
                 <MyStatusBar />
                 {
-                    this.state.user && <Header title={this.state.user.fullname} settings={this.settings()}/>
+                    this.state.user &&
+                    <Header title={this.state.user.fullname} settings={this.settings()}/>
+                }
+                {
+                    this.state.error &&
+                    <ErrorMessage message={this.state.error} />
                 }
             </View>
         );

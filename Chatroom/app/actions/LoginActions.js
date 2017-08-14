@@ -1,11 +1,10 @@
 import {baseUrl} from './baseurl';
 
 export function authenticate(data){
-    console.log(data);
     return (dispatch,getState) => {
         dispatch({type : "TRY_LOGIN",payload : {} })
 
-        console.log("Fetching : "+ baseUrl+ "/auth/obtaintoken/");
+        // console.log("Fetching : "+ baseUrl+ "/auth/obtaintoken/");
         fetch(baseUrl+ "/auth/obtaintoken/",{
             method : 'post',
             body: JSON.stringify(data),
@@ -28,7 +27,7 @@ export function authenticate(data){
             }
         }).catch((error) => {
             console.log(error);
-            dispatch({type : "LOGIN_FAILED", payload: {error : "Something Wrong..."}})
+            dispatch({type : "LOGIN_FAILED", payload: {error : ["Something Wrong..."]}})
 
         })
     }
