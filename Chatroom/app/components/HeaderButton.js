@@ -9,6 +9,8 @@ import {
   Modal
 } from 'react-native';
 
+import MyModal from './MyModal';
+
 const window = Dimensions.get("window");
 
 export default class HeaderButton extends Component {
@@ -41,40 +43,28 @@ constructor(){
             hidden : !this.state.hidden
         });
     }
+
+    settingsView(){
+        return (
+                <ListView
+                        dataSource = {this.state.settingsDataSource}
+                        renderRow = {this.renderRow.bind(this)}
+                />
+        );
+    }
+
   render() {
     return (
             <View>
                 <TouchableOpacity  onPress={this.toggleSettings.bind(this)}>
                     <Text style={styles.buttonText}>settings</Text>
                 </TouchableOpacity>
-                {   !this.state.hidden &&
-
-                        <Modal
-                          animationType={"fade"}
-                          transparent={true}
-                          visible={!this.state.hidden}
-                          onRequestClose={this.toggleSettings.bind(this)}
-                          >
-                            <View style={{flex:1,alignItems:'center',justifyContent:'center',margin:window.width*0.1,borderRadius:15,backgroundColor:'steelblue'}}
-                            elevation={10}>
-                                <View style={{flex:1,alignItems:'center',justifyContent:'center'}}>
-                                    <Text style={{fontWeight:'bold',fontSize:25,color:'white'}}>Settings</Text>
-                                </View>
-                                <View style={{flex:3,alignItems:'center',justifyContent:'center'}}>
-                                    <ListView
-                                            style={styles.settingsList}
-                                            dataSource = {this.state.settingsDataSource}
-                                            renderRow = {this.renderRow.bind(this)}
-                                    />
-                                </View>
-                                <View style={{flex:1,alignItems:'center',justifyContent:'center'}}>
-                                    <TouchableOpacity onPress={() => {this.toggleSettings();}} >
-                                        <Text style={{color:'red',padding:10,paddingLeft:15,paddingRight:15,backgroundColor:'white',borderRadius:20,fontWeight:'bold',fontSize:20}}>X</Text>
-                                    </TouchableOpacity>
-                                </View>
-                            </View>
-                        </Modal>
-                }
+                <MyModal
+                          title={"Settings"}
+                          hidden={this.state.hidden}
+                          contentView={this.settingsView()}
+                          toggleFunction={this.toggleSettings.bind(this)}
+                        />
             </View>
     );
   }
@@ -97,8 +87,5 @@ const styles = StyleSheet.create({
     width : window.width * 0.65,
     textAlign:'center',
     backgroundColor:'white'
-  },
-  settingsList : {
-
   }
 });

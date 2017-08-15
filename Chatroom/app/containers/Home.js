@@ -3,8 +3,11 @@ import {
   AppRegistry,
   StyleSheet,
   Text,
+  TextInput,
+  TouchableOpacity,
   View,
   AsyncStorage,
+  ListView,
   Dimensions
 } from 'react-native';
 
@@ -21,10 +24,9 @@ import MyButton from '../components/MyButton';
 
 import Header from '../components/Header';
 import MyStatusBar from '../components/MyStatusBar';
+import NewChatroomModal from '../components/NewChatroomModal';
 
 const window = Dimensions.get("window");
-
-
 class Home extends Component {
 
   static navigationOptions = {
@@ -34,18 +36,20 @@ class Home extends Component {
 
     constructor(){
         super();
+        const ds = new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2});
         this.state = {
             token : null,
-            loading: true,
+            loading: false,
             user: null,
-            chatrooms : [],
-            error : null
-
+            chatroomsDataSource : ds,
+            error : null,
+            hidden : true
         }
+        this.refreshHandler = null;
     }
 
     componentWillMount(){
-        AsyncStorage.getItem("token").then(token => {
+        AsyncStorage.getItem("token").then((token) => {
             if(token===null || token === ""){
                 this.navigateToLoginScreen()
             }else{
@@ -55,23 +59,44 @@ class Home extends Component {
         }).catch(error => {console.log(error)});
     }
 
+    componentDidMount(){
+        this.setState({
+              chatroomsDataSource : this.state.chatroomsDataSource.cloneWithRows(this.props.home.chatrooms)
+            });
+        this.refreshHandler = setInterval(this.getChatrooms.bind(this),5000);
+
+    }
+
+    getChatrooms(){
+        console.log("Refresing chatrooms...");
+        if(this.state && this.state.token!==null){
+                this.props.refreshChatroomsList(this.state.token);
+            }
+    }
+
+    componentWillUnmount() {
+        clearInterval(this.refreshHandler);
+    }
+
     componentWillReceiveProps(nextProps) {
         if(nextProps.home != this.props.home){
             this.setState({
                 token : nextProps.home.token,
                 loading : nextProps.home.loading,
                 user : nextProps.home.user,
-                chatrooms: nextProps.home.chatrooms,
-                error : nextProps.home.error
+                error : nextProps.home.error,
+                chatroomsDataSource : this.state.chatroomsDataSource.cloneWithRows(nextProps.home.chatrooms)
             });
         }
     }
+
+
 
     settings(){
       return [
         {
             name : 'New Chatroom',
-            action: () => {alert("New Chatroom");}
+            action: this.toggleNewChatroomModal.bind(this)
         },
         {
             name : 'Logout',
@@ -82,8 +107,14 @@ class Home extends Component {
             action : () => {alert(`Vaibhav Kollipara\nvkollip1@binghamton.edu\n660-528-5433`);}
         }
       ]
-
     }
+
+      errorSettings(){
+        return    [{
+                name : 'Re Login',
+                action : this.logout.bind(this)
+            }]
+      }
 
     navigateToLoginScreen(){
         const resetAction = NavigationActions.reset({
@@ -102,6 +133,20 @@ class Home extends Component {
         });
     }
 
+    toggleNewChatroomModal(){
+        this.setState({
+            hidden : !this.state.hidden
+        });
+    }
+
+    renderRow(chatroom,sectionId, rowId, highlightId){
+        return (
+            <TouchableOpacity onPress={() => {alert(`Name : ${chatroom.name}\nSlug : ${chatroom.slug}\nUrl : ${chatroom.url}`)}}>
+                <Text style={styles.chatroomName}>{chatroom.name}</Text>
+            </TouchableOpacity>
+        );
+    }
+
   render() {
     if(this.state.loading){
         return (
@@ -109,10 +154,6 @@ class Home extends Component {
         );
     }else{
 
-      let action = {
-        title:"Logout",
-        clicked : this.logout.bind(this)
-      }
         return (
             <View style={styles.container}>
                 <MyStatusBar />
@@ -121,9 +162,30 @@ class Home extends Component {
                     <Header title={this.state.user.fullname} settings={this.settings()}/>
                 }
                 {
-                    this.state.error &&
-                    <ErrorMessage message={this.state.error} />
+                        !this.state.user &&
+                        <Header settings={this.errorSettings()}/>
                 }
+                <View style={{marginTop:75}}>
+                    <NewChatroomModal
+                            hidden={this.state.hidden}
+                            title={"New Chatroom"}
+                            toggleFunction={ this.toggleNewChatroomModal.bind(this) }
+                            token={this.state.token}
+                        />
+                    {
+                        this.state.error &&
+                        <View>
+                            <ErrorMessage message={this.state.error} />
+                        </View>
+                    }
+
+                        <ListView
+
+                            dataSource = {this.state.chatroomsDataSource}
+                            renderRow = {this.renderRow.bind(this)}
+                            enableEmptySections
+                        />
+                </View>
             </View>
         );
     }
@@ -134,7 +196,16 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center',
-    alignItems: 'center'
+    alignItems: 'center',
+  },
+  chatroomName : {
+    padding:20,
+    margin:5,
+    borderRadius:10,
+    borderWidth:5,
+    borderColor:'#2b7abc',
+    textAlign:'center',
+    width:window.width *0.75
   }
 });
 

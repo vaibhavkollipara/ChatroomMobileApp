@@ -14,6 +14,7 @@ const window = Dimensions.get("window");
 export default class Header extends Component {
 
   static defaultProps = {
+    title : "Home",
     settings : null
   }
 

@@ -4,13 +4,16 @@
 	"private": true,
 	"scripts": {
 		"start": "node node_modules/react-native/local-cli/cli.js start",
-		"test": "jest"
+		"test": "jest",
+		"devtools": "react-devtools"
 	},
 	"dependencies": {
 		"react": "16.0.0-alpha.12",
+		"react-devtools": "^2.5.0",
 		"react-native": "0.47.1",
 		"react-navigation": "^1.0.0-beta.11",
 		"react-redux": "^5.0.6",
+		"react-timer-mixin": "^0.13.3",
 		"redux": "^3.7.2",
 		"redux-logger": "^3.0.6",
 		"redux-thunk": "^2.2.0"
@@ -25,6 +28,8 @@
 		"preset": "react-native"
 	},
 	"rnpm": {
-	   	"assets": ["/assets/fonts"]
+		"assets": [
+			"/assets/fonts"
+		]
 	}
 }

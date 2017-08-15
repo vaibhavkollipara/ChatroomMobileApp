@@ -17,6 +17,7 @@ export function authenticate(data){
             console.log(response);
             if(response.status==200){
                 response.json().then(response => {
+                    dispatch({type:"TOKEN_OBTAINED",payload:response.token.toString()})
                     dispatch({type: "LOGIN_SUCCESSFUL",payload : response.token.toString() });
                 }).catch(error => {console.log(error)});
             }else{

@@ -12,9 +12,12 @@ const window = Dimensions.get("window");
 export default class ErrorMessage extends Component {
 
     getErrorContent(errors){
-        console.log(errors);
-        let i=1;
-        return errors.map((error) => <Text key={i++} style={styles.errorText} >{error}</Text>);
+        if(Array.isArray(errors)){
+            let i=1;
+            return errors.map((error) => <Text key={i++} style={styles.errorText} >{error}</Text>);
+        }else{
+            return <Text style={styles.errorText}>{errors}</Text>
+        }
     }
 
     getErrorMessages(){

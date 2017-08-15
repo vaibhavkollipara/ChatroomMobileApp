@@ -9,7 +9,7 @@ const defaultState = {
 export default (state=defaultState,action) => {
     switch(action.type){
         case "TOKEN_OBTAINED":
-            return {...state, token:action.payload}
+            return {...state,error:null,token:action.payload}
         case "FETCH_USER_DETAILS":
             return {...state, error:null, loading:true};
         case "FETCH_USER_DETAILS_FAILED":
@@ -21,7 +21,9 @@ export default (state=defaultState,action) => {
         case "CHATROOMS_REFRESH_FAILED":
             return {...state,error:action.payload}
         case "LOGOUT":
-            return {...state,token:null,user:null};
+            return {...state,error:null,chatrooms:[],token:null,user:null};
+        case "SET_ERROR":
+            return {...state,error : action.payload};
         default:
             return state;
     }

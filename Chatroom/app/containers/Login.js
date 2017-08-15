@@ -36,8 +36,8 @@ class Login extends Component {
             error : null,
             loading : false,
             form_data : {
-                username : "",
-                password : ""
+                username : "user7",
+                password : "Commonpassword1"
             }
         };
     }
@@ -68,7 +68,6 @@ class Login extends Component {
     }
 
     usernameChange(value){
-        console.log(`Value : ${value}`);
         this.setState({
             form_data : {...this.state.form_data,username:value}
         });
@@ -124,7 +123,6 @@ class Login extends Component {
                 />
                 <TextInput
                     style={styles.inputbox}
-                    onChangeText={(text) => {}}
                     placeholder="password"
                     onChangeText={(text) => {this.passwordChange(text)}}
                     value={this.state.form_data.password}
