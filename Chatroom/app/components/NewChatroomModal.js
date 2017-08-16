@@ -19,96 +19,22 @@ const window = Dimensions.get("window");
 
 export default class NewChatroomModal extends Component {
 
-  static defaultProps = {
-      width : null,
-      token: null
-  }
-
-    constructor(){
-        super();
-        this.state = {
-            loading: false,
-            chatroomName : "",
-            error : null
-        }
-    }
-
-    onChatroomNameChange(value){
-        this.setState({
-            chatroomName : value
-        });
-    }
-
-
 
   newChatroomView(){
-
-        if(this.state.loading){
-            return (
-                <MyActivityIndicator
-                    message={"Creating New Chatroom"}
-                />
-            );
-        }else{
             return ( <View style={{flex:1,alignItems:'center',justifyContent:'center'}} >
                             <TextInput
                                         style={styles.inputbox}
                                         placeholder="New Chatroom Name"
-                                        onChangeText={(text) => {this.onChatroomNameChange(text)}}
-                                        value={this.state.chatroomName}
+                                        onChangeText={(text) => {this.props.onNewChatroomNameChange(text)}}
+                                        value={this.props.newChatroomName}
                                         underlineColorAndroid='transparent'
                                   />
-                            {
-                                this.state.error && <ErrorMessage message={this.state.error}/>
-                            }
-                            <MyButton   onClick={this.createChatroom.bind(this)}
+                            <MyButton   onClick={this.props.createChatroom.bind(this)}
                                         buttonText={"Create"}
                                         width={window.width*0.5}
                                       />
                     </View>
                 );
-        }
-    }
-
-    createChatroom(){
-        if(this.state.chatroomName){
-        fetch(baseUrl+ "/newchatroom/",{
-                method : 'post',
-                body : JSON.stringify({ name : this.state.chatroomName }),
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json',
-                    'Authorization': `JWT ${this.props.token}`
-                  }
-            }).then((response) =>{
-                if(response.status==201){
-                    this.setState({
-                        loading:false
-                    });
-                    alert("New Chatroom Created");
-                    this.props.toggleFunction();
-                }else{
-                    response.json().then((response) => {
-                        console.log("NCR ERROR.....");
-                        console.log(response);
-                        this.setState({
-                            loading: false,
-                            error : response
-                        });
-                    });
-                }
-
-            }).catch((error) =>{
-                this.setState({
-                    loading : false,
-                    error : {error : error.toString()}
-                });
-            });
-        }else{
-            this.setState({
-                error : {error : "Chatroom Name Cannot Be Empty"}
-            });
-        }
     }
 
   render() {

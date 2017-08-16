@@ -16,12 +16,14 @@ import Login from './Login';
 import Signup from './Signup';
 import Home from './Home';
 import Test from './Test';
+import Chatroom from './Chatroom';
 
 
 const AppNav = StackNavigator({
 
   // Test : {screen : Test},
   Home : {screen: Home},
+  Chatroom : {screen :Chatroom},
   Login : { screen: Login},
   Signup : { screen: Signup }
 });

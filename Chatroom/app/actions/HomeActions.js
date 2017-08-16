@@ -55,6 +55,31 @@ export function refreshChatroomsList(token){
     }
 }
 
+export function createChatroom(token,chatroomName){
+    return (dispatch,getState) => {
+        fetch(`${baseUrl}/newchatroom/`,{
+                method : 'post',
+                body : JSON.stringify({ name : chatroomName }),
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'Authorization': `JWT ${token}`
+                  }
+            }).then((response) =>{
+                if(response.status!==201){
+
+                    response.json().then((response) => {
+                        console.log(response);
+                        dispatch({type:"SET_ERROR",payload:response})
+                    });
+                }
+
+            }).catch((error) =>{
+                dispatch({type:"SET_ERROR",payload:{error: "Problem with network"}})
+            });
+    }
+}
+
 
 export function setToken(token){
     return (dispatch,getState) => {

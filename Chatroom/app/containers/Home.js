@@ -43,7 +43,9 @@ class Home extends Component {
             user: null,
             chatroomsDataSource : ds,
             error : null,
-            hidden : true
+            hidden : true,
+            newChatroomName : "",
+            chatroomsLoading:true
         }
         this.refreshHandler = null;
     }
@@ -67,16 +69,10 @@ class Home extends Component {
 
     }
 
-    getChatrooms(){
-        console.log("Refresing chatrooms...");
-        if(this.state && this.state.token!==null){
-                this.props.refreshChatroomsList(this.state.token);
-            }
-    }
-
     componentWillUnmount() {
         clearInterval(this.refreshHandler);
     }
+
 
     componentWillReceiveProps(nextProps) {
         if(nextProps.home != this.props.home){
@@ -139,16 +135,49 @@ class Home extends Component {
         });
     }
 
+    getChatrooms(){
+        if(this.state && this.state.token!==null){
+                this.props.refreshChatroomsList(this.state.token);
+                if(this.state.chatroomsLoading){
+                    this.setState({
+                        chatroomsLoading : false
+                    });
+                }
+            }
+    }
+
+    onNewChatroomNameChange(value){
+        this.setState({
+            newChatroomName : value
+        });
+    }
+
+    createChatroom(){
+        if(this.state.newChatroomName){
+            this.props.createChatroom(this.state.token,this.state.newChatroomName);
+            this.toggleNewChatroomModal();
+            this.setState({
+                newChatroomName : ""
+            });
+        }
+    }
+
     renderRow(chatroom,sectionId, rowId, highlightId){
         return (
-            <TouchableOpacity onPress={() => {alert(`Name : ${chatroom.name}\nSlug : ${chatroom.slug}\nUrl : ${chatroom.url}`)}}>
+            <TouchableOpacity onPress={() => {
+                this.props.navigation.navigate("Chatroom",{
+                        chatroomName:chatroom.name,
+                        chatroomSlug:chatroom.slug,
+                        fullname : this.state.user.fullname
+                    })
+            }}>
                 <Text style={styles.chatroomName}>{chatroom.name}</Text>
             </TouchableOpacity>
         );
     }
 
   render() {
-    if(this.state.loading){
+    if(this.state.loading || this.state.chatroomsLoading){
         return (
             <MyActivityIndicator message={"Fetching User Details"} />
         );
@@ -169,8 +198,9 @@ class Home extends Component {
                     <NewChatroomModal
                             hidden={this.state.hidden}
                             title={"New Chatroom"}
+                            onNewChatroomNameChange={this.onNewChatroomNameChange.bind(this)}
                             toggleFunction={ this.toggleNewChatroomModal.bind(this) }
-                            token={this.state.token}
+                            createChatroom={this.createChatroom.bind(this)}
                         />
                     {
                         this.state.error &&
@@ -221,6 +251,7 @@ function mapDispatchToProps(dispatch){
                 fetchUserDetails : homeActions.fetchUserDetails,
                 setToken : homeActions.setToken,
                 refreshChatroomsList : homeActions.refreshChatroomsList,
+                createChatroom: homeActions.createChatroom,
                 logout : homeActions.logout
             },dispatch);
 }

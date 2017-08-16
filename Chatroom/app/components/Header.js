@@ -14,24 +14,46 @@ const window = Dimensions.get("window");
 export default class Header extends Component {
 
   static defaultProps = {
-    title : "Home",
-    settings : null
+    title : "",
+    settings : null,
+    backFunction : null
+  }
+
+  displayTitle(){
+    if(this.props.title.length<=15){
+        return this.props.title.toUpperCase();
+    }else{
+        return `${this.props.title.substring(0,9)}...`.toUpperCase();
+    }
   }
 
   render() {
-    return (
-        <View style={styles.container} elevation={5}>
-            <View style={styles.titleBox}>
-                <Text style={styles.title}>{this.props.title}</Text>
-            </View>
-            {   this.props.settings &&
-                <View style={styles.action}>
-                    <HeaderButton settings={this.props.settings} />
+      return (
+          <View style={styles.container} elevation={5}>
+            {
+                this.props.backFunction &&
+                <View style={{flex:1,alignItems:'flex-start',justifyContent:'center'}}>
+                    <TouchableOpacity onPress={this.props.backFunction.bind(this)}>
+                        <Text style={{marginLeft:10,fontWeight:'bold',color:'white'}}>Back</Text>
+                    </TouchableOpacity>
                 </View>
             }
+              <View style={[
+                    this.props.backFunction && {flex:2},
+                    !this.props.backFunction && {flex:3},
+                    styles.titleBox,
 
-        </View>
-    );
+                ]}>
+                  <Text style={styles.title}>{this.displayTitle()}</Text>
+              </View>
+              {   this.props.settings &&
+                  <View style={styles.action}>
+                      <HeaderButton settings={this.props.settings} />
+                  </View>
+              }
+
+          </View>
+      );
   }
 }
 
@@ -43,7 +65,6 @@ const styles = StyleSheet.create({
     flexDirection :'row'
   },
   titleBox :{
-    flex:3,
     alignItems:'flex-start',
     justifyContent: 'center',
     padding : 20
@@ -55,7 +76,8 @@ const styles = StyleSheet.create({
   },
   action :{
     flex:1,
-    alignItems:'flex-start',
+    alignItems:'flex-end',
+    marginRight:5,
     justifyContent: 'center',
     overflow:'visible'
   }
