@@ -29,7 +29,11 @@ export default class NewChatroomModal extends Component {
                                         value={this.props.newChatroomName}
                                         underlineColorAndroid='transparent'
                                   />
-                            <MyButton   onClick={this.props.createChatroom.bind(this)}
+                            <MyButton   onClick={()=>{
+                                                  console.log("Clicked...");
+                                                  this.props.toggleFunction();
+                                                  this.props.createChatroom();
+                                                }}
                                         buttonText={"Create"}
                                         width={window.width*0.5}
                                       />

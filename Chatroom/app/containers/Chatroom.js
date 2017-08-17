@@ -27,6 +27,8 @@ import MyStatusBar from '../components/MyStatusBar';
 import SendMessage from '../components/SendMessage';
 
 import MyModal from '../components/MyModal';
+import ConfirmationModal from '../components/ConfirmationModal';
+import DeveloperModal from '../components/DeveloperModal';
 
 const window = Dimensions.get("window");
 class Chatroom extends Component {
@@ -50,7 +52,13 @@ class Chatroom extends Component {
             message : "",
             membersDataSource : ds,
             membersModalHidden : true,
-            loading:true
+            loading:true,
+            exitConfirmationModalHidden : true,
+            newMemberModalHidden : true,
+            newMemberName : "",
+            userSuggestionsDataSource : ds,
+            addMemberError : null,
+            developerModalHidden : true
         }
         this.refreshHandler = null;
     }
@@ -90,7 +98,9 @@ class Chatroom extends Component {
                 error : nextProps.chatroom.error,
                 membersDataSource : this.state.membersDataSource.cloneWithRows(nextProps.chatroom.members),
                 messagesDataSource : this.state.messagesDataSource.cloneWithRows(nextProps.chatroom.messages),
-                members : nextProps.chatroom.members
+                members : nextProps.chatroom.members,
+                userSuggestionsDataSource : this.state.userSuggestionsDataSource.cloneWithRows(nextProps.chatroom.userSuggestions),
+                addMemberError : nextProps.chatroom.addMemberError
             });
         }
     }
@@ -104,8 +114,12 @@ class Chatroom extends Component {
             action : this.membersModalToggle.bind(this)
         },
         {
+            name: 'Add New Member',
+            action : this.toggleNewMemberModal.bind(this)
+        },
+        {
             name : 'Exit From Chatroom',
-            action : ()=> {alert("Exit from Chatroom")}
+            action : this.exitConfirmationModalToggle.bind(this)
         },
         {
             name : 'Logout',
@@ -113,7 +127,7 @@ class Chatroom extends Component {
         },
         {
             name : 'Developer Details',
-            action : () => {alert(`Vaibhav Kollipara\nvkollip1@binghamton.edu\n660-528-5433`);}
+            action : this.toggleDeveloperModal.bind(this)
         }
       ]
     }
@@ -130,6 +144,16 @@ class Chatroom extends Component {
               index: 0,
               actions: [
                 NavigationActions.navigate({ routeName: 'Login'})
+              ]
+            })
+        this.props.navigation.dispatch(resetAction);
+    }
+
+    navigateToHomeScreen(){
+        const resetAction = NavigationActions.reset({
+              index: 0,
+              actions: [
+                NavigationActions.navigate({ routeName: 'Home'})
               ]
             })
         this.props.navigation.dispatch(resetAction);
@@ -154,27 +178,6 @@ class Chatroom extends Component {
                     })
                 }
             }
-    }
-
-    renderMemberRow(member,sectionId, rowId, highlightId){
-        return (
-            <View style={{width:window.width*0.65,borderWidth:2,borderRadius:10,margin:10,
-            borderColor:'white',alignItems:'center',justifyContent:'center',padding:10}}>
-                <Text style={{color:'white'}}>{member.name}</Text>
-                <Text style={{color:'white'}}>{member.email}</Text>
-            </View>
-        );
-    }
-
-    membersView(){
-        return ( <View style={{flex:1,alignItems:'center',justifyContent:'center'}} >
-                            <ListView
-                                dataSource = {this.state.membersDataSource}
-                                renderRow = {this.renderMemberRow.bind(this)}
-                                enableEmptySections
-                            />
-                    </View>
-                );
     }
 
     renderRow(message,sectionId, rowId, highlightId){
@@ -206,6 +209,99 @@ class Chatroom extends Component {
         }
     }
 
+    //New Member............
+
+    toggleNewMemberModal(){
+        this.setState({
+            newMemberModalHidden : !this.state.newMemberModalHidden
+        });
+    }
+
+    onNewMemberNameChange(value){
+        this.setState({
+            newMemberName : value
+        });
+        if(value.length >4){
+            this.props.getUserSuggestions(this.state.token,value);
+        }
+    }
+    addMember(username){
+        this.props.addMember(this.state.token,this.state.chatroomSlug,username);
+        this.setState({
+            newMemberName : ""
+        });
+    }
+
+    renderUserSuggestionRow(user,sectionId, rowId, highlightId){
+        return (
+            <TouchableOpacity style={{flex:1,alignItems:'center',justifyContent:'center'}}
+                        onPress={() => {this.addMember(user.username);}}
+                >
+            <View style={{width:window.width*0.65,borderWidth:2,borderRadius:10,margin:10,
+            borderColor:'white',alignItems:'center',justifyContent:'center',padding:10}}>
+                <Text style={{color:'white'}}>{user.fullname}</Text>
+                <Text style={{color:'white'}}>{user.email}</Text>
+            </View>
+            </TouchableOpacity>
+        );
+    }
+
+    newMemberView(){
+        return (
+            <View style={{flex:1,flexDirection:'column'}}>
+                {
+                    this.state.addMemberError &&
+                    <View style={{flex:1,alignItems:'center',justifyContent:'center',backgroundColor:'white',borderRadius:10}}>
+                        <ErrorMessage
+                            message={this.state.addMemberError}
+                        />
+                    </View>
+                }
+                <View style={{flex:1,alignItems:'center',justifyContent:'center'}}>
+                    <TextInput
+                                        style={styles.inputbox}
+                                        placeholder="Search User"
+                                        onChangeText={(text) => {this.onNewMemberNameChange(text)}}
+                                        value={this.state.newMemberName}
+                                        underlineColorAndroid='transparent'
+                                  />
+                </View>
+                <View style={{flex:2,alignItems:'center',justifyContent:'center'}} >
+                            <ListView
+                                dataSource = {this.state.userSuggestionsDataSource}
+                                renderRow = {this.renderUserSuggestionRow.bind(this)}
+                                enableEmptySections
+                            />
+                    </View>
+            </View>
+        );
+    }
+
+    //...................
+
+    //View Members Functionality....................
+
+    renderMemberRow(member,sectionId, rowId, highlightId){
+        return (
+            <View style={{width:window.width*0.65,borderWidth:2,borderRadius:10,margin:10,
+            borderColor:'white',alignItems:'center',justifyContent:'center',padding:10}}>
+                <Text style={{color:'white'}}>{member.name}</Text>
+                <Text style={{color:'white'}}>{member.email}</Text>
+            </View>
+        );
+    }
+
+    membersView(){
+        return ( <View style={{flex:1,alignItems:'center',justifyContent:'center'}} >
+                            <ListView
+                                dataSource = {this.state.membersDataSource}
+                                renderRow = {this.renderMemberRow.bind(this)}
+                                enableEmptySections
+                            />
+                    </View>
+                );
+    }
+
     membersModalToggle(){
         this.setState({
             membersModalHidden : !this.state.membersModalHidden
@@ -218,6 +314,30 @@ class Chatroom extends Component {
         });
     }
 
+    //.......................................
+
+    //Exit Chatroom Functionality.................
+    exitConfirmationModalToggle(){
+        this.setState({
+            exitConfirmationModalHidden : !this.state.exitConfirmationModalHidden
+        });
+    }
+
+    exitChatroom(){
+        this.props.exitChatroom(this.state.token,this.state.chatroomSlug);
+        this.navigateToHomeScreen();
+    }
+
+    //.........................................
+
+    //Developer Modal Functionality..............
+
+    toggleDeveloperModal(){
+        this.setState({
+            developerModalHidden : !this.state.developerModalHidden
+        });
+    }
+    //...................................
   render() {
     if(!this.state.token || this.state.loading){
         return (
@@ -238,15 +358,30 @@ class Chatroom extends Component {
                 {
                     !this.state.chatroomName &&
                     <Header title={"Chatroom"} settings={this.errorSettings()}/>
-                }{
-                    this.state.members &&
-                    <MyModal
-                        contentView={this.membersView()}
-                        title={"Members"}
-                        hidden={this.state.membersModalHidden}
-                        toggleFunction={this.membersModalToggle.bind(this)}
-                    />
                 }
+                <MyModal
+                    contentView={this.membersView()}
+                    title={"Members"}
+                    hidden={this.state.membersModalHidden}
+                    toggleFunction={this.membersModalToggle.bind(this)}
+                />
+                <DeveloperModal
+                        hidden={this.state.developerModalHidden}
+                        toggleFunction={this.toggleDeveloperModal.bind(this)}
+                    />
+                <MyModal
+                            hidden={this.state.newMemberModalHidden}
+                            title={"Add Member"}
+                            contentView={this.newMemberView()}
+                            toggleFunction={this.toggleNewMemberModal.bind(this)}
+                        />
+                <ConfirmationModal
+                    title={"Exit Chatroom"}
+                    message={"Are you sure ? You will not be able to view messages in this group unless a member adds you to this group again..."}
+                    toggleFunction={this.exitConfirmationModalToggle.bind(this)}
+                    confirmAction={this.exitChatroom.bind(this)}
+                    hidden={this.state.exitConfirmationModalHidden}
+                />
                 <View style={{marginTop:75,flexDirection:'column',alignItems:'center',justifyContent:'center'}}>
                     {
                         this.state.error &&
@@ -294,6 +429,16 @@ const styles = StyleSheet.create({
   },
   messageSender :{
     fontWeight: 'bold'
+  },
+  inputbox:{
+    width : window.width *0.65,
+    borderColor: 'gray',
+    borderWidth: 1,
+    backgroundColor: 'white',
+    textAlign:'center',
+    borderRadius : 10,
+    margin: 10,
+    height:50
   }
 });
 
@@ -308,7 +453,10 @@ function mapDispatchToProps(dispatch){
     return bindActionCreators({
                 loadMessages : chatroomActions.loadMessages,
                 sendMessage : chatroomActions.sendMessage,
-                fetchMembers : chatroomActions.fetchMembers
+                fetchMembers : chatroomActions.fetchMembers,
+                exitChatroom : chatroomActions.exitChatroom,
+                getUserSuggestions : chatroomActions.getUserSuggestions,
+                addMember : chatroomActions.addMember
             },dispatch);
 }
 

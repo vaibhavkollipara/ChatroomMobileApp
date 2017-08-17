@@ -36,8 +36,8 @@ class Login extends Component {
             error : null,
             loading : false,
             form_data : {
-                username : "user7",
-                password : "Commonpassword1"
+                username : "",
+                password : ""
             }
         };
     }
@@ -71,14 +71,14 @@ class Login extends Component {
         this.setState({
             form_data : {...this.state.form_data,username:value}
         });
-        console.log(` form value : ${this.state.form_data.username}`);
+        // console.log(` form value : ${this.state.form_data.username}`);
     }
 
     passwordChange(value){
         this.setState({
             form_data : {...this.state.form_data,password:value}
         });
-        console.log(this.state.form_data.password);
+        // console.log(this.state.form_data.password);
     }
 
     isFormFilled(){
@@ -103,7 +103,7 @@ class Login extends Component {
   render() {
     if(this.state.loading){
         return (
-            <View>
+            <View style={styles.container}>
                 <MyStatusBar />
                 <MyActivityIndicator message={"Verifying Credentials"}/>
             </View>
@@ -116,7 +116,6 @@ class Login extends Component {
                 <TextInput
                     style={styles.inputbox}
                     placeholder={"username"}
-                    autoFocus={true}
                     onChangeText={(text) => {this.usernameChange(text)}}
                     value={this.state.form_data.username}
                     underlineColorAndroid='transparent'

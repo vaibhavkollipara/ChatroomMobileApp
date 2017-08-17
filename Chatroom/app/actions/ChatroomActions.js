@@ -75,3 +75,72 @@ export function sendMessage(token,chatroomSlug,message){
             });
     }
 }
+
+export function exitChatroom(token,chatroomSlug){
+    return (dispatch,getState) => {
+        fetch(`${baseUrl}/chatroom/${chatroomSlug}/exit/`,{
+                method:'delete',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'Authorization': `JWT ${token}`
+                }
+            }).then((response) => {
+                if(response.status!==204){
+                    response.json().then((response) => {
+                        dispatch({type:"SET_ERROR",payload:response })
+                    })
+                }
+            }).catch((response) => {
+                dispatch({type:"SET_ERROR",payload: {error: "Problem with network"}})
+            });
+    }
+}
+
+export function addMember(token,chatroomSlug,username){
+    return (dispatch,getState) => {
+        fetch(`${baseUrl}/chatroom/${chatroomSlug}/newmember/`,{
+                method:'post',
+                body : JSON.stringify({
+                    username
+                }),
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'Authorization': `JWT ${token}`
+                }
+            }).then((response) => {
+                if(response.status!=201){
+                    response.json().then((response) => {
+                        dispatch({type:"SET_ADD_MEMBER_ERROR",payload:response })
+                    })
+                }else{
+                    dispatch({type:"ADD_MEMBER_SUCCESS",payload:{}});
+                }
+            }).catch((response) => {
+                dispatch({type:"SET_ADD_MEMBER_ERROR",payload: {error: "Problem with network"}})
+            });
+    }
+}
+
+export function getUserSuggestions(token,searchString){
+    return (dispatch,getState) => {
+        http://127.0.0.1:8000/accounts/users/?search='+searchstring
+        fetch(`${baseUrl}/accounts/users/?search=${searchString}`,{
+                method:'get',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'Authorization': `JWT ${token}`
+                }
+            }).then((response) => {
+                if(response.status==200){
+                    response.json().then((response) => {
+                        dispatch({type:"USER_SUGGESTIONS_FETCHED",payload:response.results })
+                    })
+                }
+            }).catch((response) => {
+                dispatch({type:"SET_ERROR",payload: {error: "Problem with network"}})
+            });
+    }
+}

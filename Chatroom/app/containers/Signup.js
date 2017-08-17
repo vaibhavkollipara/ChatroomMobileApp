@@ -128,7 +128,7 @@ class Signup extends Component {
 
     if(this.state.loading){
         return(
-            <View>
+            <View style={{flex:1,justifyContent:'center',alignItems:'center'}}>
                 <MyStatusBar />
                 <MyActivityIndicator message={"Signing Up"}/>
             </View>

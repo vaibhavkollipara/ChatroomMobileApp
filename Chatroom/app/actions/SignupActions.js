@@ -20,24 +20,18 @@ export function register(data) {
             .then((response) => {
                 if(response.status==201){
                     response.json().then((response) => {
-                        sleep(1000 * 20).then(() => {
-                            dispatch( {type:"SIGNUP_SUCCESSFUL",payload:{}} );
-                        });
+                        dispatch( {type:"SIGNUP_SUCCESSFUL",payload:{}} );
                     });
                 }else{
                     response.json().then((response) => {
-                        sleep(1000 * 20).then(() => {
-                            dispatch( {type:"SIGNUP_FAILED",payload:response} );
-                        });
+                        dispatch( {type:"SIGNUP_FAILED",payload:response} );
 
                     });
 
                 }
             })
             .catch((error) => {
-                sleep(1000 * 20).then(() => {
-                            dispatch( {type:"SIGNUP_FAILED",payload:error} );
-                        });
+                    dispatch( {type:"SIGNUP_FAILED",payload:"Problem with network"} );
             });
     }
 }

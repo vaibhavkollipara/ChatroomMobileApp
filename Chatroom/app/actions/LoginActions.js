@@ -13,8 +13,6 @@ export function authenticate(data){
                 'Content-Type': 'application/json'
               }
         }).then((response) => {
-            console.log("Here...");
-            console.log(response);
             if(response.status==200){
                 response.json().then(response => {
                     dispatch({type:"TOKEN_OBTAINED",payload:response.token.toString()})
@@ -27,8 +25,7 @@ export function authenticate(data){
                 }).catch(error => {console.log(error)});
             }
         }).catch((error) => {
-            console.log(error);
-            dispatch({type : "LOGIN_FAILED", payload: {error : ["Something Wrong..."]}})
+            dispatch({type : "LOGIN_FAILED", payload: {error : ["Problem with network"]}})
 
         })
     }

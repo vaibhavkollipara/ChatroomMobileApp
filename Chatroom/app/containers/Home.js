@@ -25,6 +25,7 @@ import MyButton from '../components/MyButton';
 import Header from '../components/Header';
 import MyStatusBar from '../components/MyStatusBar';
 import NewChatroomModal from '../components/NewChatroomModal';
+import DeveloperModal from '../components/DeveloperModal';
 
 const window = Dimensions.get("window");
 class Home extends Component {
@@ -45,7 +46,8 @@ class Home extends Component {
             error : null,
             hidden : true,
             newChatroomName : "",
-            chatroomsLoading:true
+            chatroomsLoading:true,
+            developerModalHidden : true
         }
         this.refreshHandler = null;
     }
@@ -100,7 +102,7 @@ class Home extends Component {
         },
         {
             name : 'Developer Details',
-            action : () => {alert(`Vaibhav Kollipara\nvkollip1@binghamton.edu\n660-528-5433`);}
+            action : this.toggleDeveloperModal.bind(this)
         }
       ]
     }
@@ -129,12 +131,6 @@ class Home extends Component {
         });
     }
 
-    toggleNewChatroomModal(){
-        this.setState({
-            hidden : !this.state.hidden
-        });
-    }
-
     getChatrooms(){
         if(this.state && this.state.token!==null){
                 this.props.refreshChatroomsList(this.state.token);
@@ -146,21 +142,29 @@ class Home extends Component {
             }
     }
 
+    //New Chatroom Functionality...............
     onNewChatroomNameChange(value){
         this.setState({
             newChatroomName : value
         });
     }
 
+    toggleNewChatroomModal(){
+        this.setState({
+            hidden : !this.state.hidden
+        });
+    }
+
     createChatroom(){
         if(this.state.newChatroomName){
             this.props.createChatroom(this.state.token,this.state.newChatroomName);
-            this.toggleNewChatroomModal();
             this.setState({
                 newChatroomName : ""
             });
         }
     }
+
+    //..............................
 
     renderRow(chatroom,sectionId, rowId, highlightId){
         return (
@@ -174,6 +178,12 @@ class Home extends Component {
                 <Text style={styles.chatroomName}>{chatroom.name}</Text>
             </TouchableOpacity>
         );
+    }
+
+    toggleDeveloperModal(){
+        this.setState({
+            developerModalHidden : !this.state.developerModalHidden
+        });
     }
 
   render() {
@@ -194,14 +204,18 @@ class Home extends Component {
                         !this.state.user &&
                         <Header settings={this.errorSettings()}/>
                 }
-                <View style={{marginTop:75}}>
-                    <NewChatroomModal
+                <DeveloperModal
+                        hidden={this.state.developerModalHidden}
+                        toggleFunction={this.toggleDeveloperModal.bind(this)}
+                    />
+                <NewChatroomModal
                             hidden={this.state.hidden}
                             title={"New Chatroom"}
                             onNewChatroomNameChange={this.onNewChatroomNameChange.bind(this)}
                             toggleFunction={ this.toggleNewChatroomModal.bind(this) }
                             createChatroom={this.createChatroom.bind(this)}
                         />
+                <View style={{marginTop:75}}>
                     {
                         this.state.error &&
                         <View>

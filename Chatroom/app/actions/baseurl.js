@@ -1,1 +1,1 @@
-export const baseUrl = "http://192.168.1.118:8000"
+export const baseUrl = "https://chatroomserver.herokuapp.com"

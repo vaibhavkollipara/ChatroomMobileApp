@@ -11,7 +11,7 @@ export default (state=defaultState,action) => {
         case "LOGIN_SUCCESSFUL":
             return {...state, error : null, loading: false, token : action.payload}
         case "LOGIN_FAILED":
-            return {...state,loading: false,token:null, error : action.payload,token:null}
+            return {...state, loading:false, token:null, error : action.payload,token:null}
         default :
             return state
     }
